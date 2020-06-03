@@ -86,7 +86,7 @@ class Wurfel {
   }
 
   Widget getWidget(BuildContext context) {
-    if (!lathato) return  Column();
+    /*if (!lathato) return Column();*/
     return Container(
 
       child: Stack(
@@ -94,7 +94,7 @@ class Wurfel {
            children: <Widget>[
             Text(MediaQuery.of(context).size.width.toString()),
             Text(MediaQuery.of(context).size.height.toString()),
-           /* Positioned (
+            Positioned (
               top:10.0,
               left:10.0,
               height:330.0,
@@ -102,7 +102,7 @@ class Wurfel {
               child:Container(
                  color: Colors.grey,
               ),
-            ),*/
+            ),
             Positioned(
                  top: 0.0,
                  left: 0.0,
@@ -110,7 +110,7 @@ class Wurfel {
                  width: ikonmeret,
                  child: Icon(Icons.fiber_manual_record,size:ikonmeret,color:_milyenSzinuLegyek(0, 0))
                   ),
-           /*  Positioned(
+             Positioned(
                  top: 0.0,
                  left: 100.0,
                  height: ikonmeret,
@@ -137,7 +137,7 @@ class Wurfel {
                  height: ikonmeret,
                  width: ikonmeret,
                  child: Icon(Icons.fiber_manual_record,size:ikonmeret,color:_milyenSzinuLegyek(1, 0))
-             ),*/
+             ),
              ],
         )
     );

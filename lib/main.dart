@@ -42,8 +42,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Wurfel _k1;
   Wurfel _k2;
-
-  void _egykocka() {
+ void _egykocka() {
       _k1.ikonmeret=100.0;
       _k2.ikonmeret=100.0;
       _k1.lathato=true;
@@ -63,13 +62,13 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title + ' ' + (((_k1.lathato)?_k1.ertek:0) + ((_k2.lathato)?_k2.ertek:0)).toString()),
+        title: Text(widget.title /*+ ' ' + (((_k1.lathato)?_k1.ertek:0) + ((_k2.lathato)?_k2.ertek:0)).toString()*/),
       ),
       body: Center(
         child:Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
-              Text('maci'),
+            Text('maci'),
               Expanded(child:_k1.getWidget(context)),
 
              // _k2.getWidget(context),
