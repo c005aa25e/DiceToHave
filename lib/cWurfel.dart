@@ -76,74 +76,92 @@ class Wurfel {
   }
 
   void novel() {
-    _ertek = ((_ertek++ == 7) ? 1 : _ertek);
+    _ertek = ((++_ertek > 6) ? 1 : _ertek);
   }
 
   void csokkent() {
-    _ertek = ((_ertek-- == 0) ? 6 : _ertek);
+    _ertek=(--_ertek < 1?6:_ertek);
   }
 
   void dobas() {
     _ertek = veletlenszamgenerator.nextInt(6) + 1;
   }
 
-  double _pottyMeret() {
-    return meret / 4;
-  }
 
   double _pottyTop(int sor, int oszlop) {
-    return _pottyMeret() * (sor + 0.5);
+    return _dotSize * (sor + 0.25) + (_availableHeight-_innerSize)/2;
   }
 
   double _pottyLeft(int sor, int oszlop) {
-    return _pottyMeret() * (oszlop + 0.5);
+    return _dotSize * (oszlop + 0.25) + (_availableWidth-_innerSize)/2;
   }
 
-  Widget getWidget(BuildContext context, double meret) {
-    this.meret=meret;
-    if (!lathato) return Column();
-    _pottyoz();
-    return Container(
-        child: Stack(
-      fit: StackFit.passthrough ,
-      children: pottyok,
+  bool _rotation=true;
 
-    ),
-      transform: Matrix4.rotationZ(0.05),
-      width: meret,
-      height: meret,
+  bool get rotation => _rotation;
+
+  set rotation(bool value) {
+    _rotation = value;
+  }
+
+  double _outerSize=0;
+  double _innerSize=0;
+  double _dotSize=0;
+  double _availableWidth=0;
+  double _availableHeight=0;
+
+  void _setSize(double width, double height){
+    _availableWidth=width;
+    _availableHeight=height;
+    _outerSize=(_availableWidth<_availableHeight?_availableWidth:_availableHeight);
+    _innerSize=(_rotation?_outerSize/1.5:_outerSize/1.1);
+    _dotSize=_innerSize/3.5;
+  }
+  double getRandomRotationAngle(){
+    return (_rotation?veletlenszamgenerator.nextInt(360)/2/pi:0);
+  }
+  Widget getWidget(BuildContext context) {
+    return LayoutBuilder(
+        builder: (context, constraints){
+          _setSize(constraints.maxWidth,constraints.maxHeight);
+          _pottyoz();
+          return Transform.rotate(
+                angle: getRandomRotationAngle(),
+                child: Stack(
+                    children: pottyok
+                )
+          );
+        }
     );
   }
 
-  _pottyoz(){
+  void _pottyoz()
+  {
     pottyok.clear();
-
     pottyok.add(Positioned(
-      top: _pottyMeret()*0.5,
-      left: _pottyMeret()*0.5,
-      height: _pottyMeret()*3,
-      width: _pottyMeret()*3,
+      top: (_availableHeight-_innerSize)/2,
+      left: (_availableWidth-_innerSize)/2,
+      height: _innerSize,
+      width: _innerSize,
       child: Container(
         decoration:BoxDecoration(
           border: Border.all(
               width: 3.0
           ),
           borderRadius: BorderRadius.all(
-              Radius.circular(_pottyMeret()/3) //         <--- border radius here
+              Radius.circular(_dotSize/3) //         <--- border radius here
           ),
         )
       )));
-
-
     for (var sor = 0; sor < 3; sor++) {
       for (var oszlop = 0; oszlop < 3; oszlop++) {
         pottyok.add(Positioned(
             top: _pottyTop(sor,oszlop),
             left: _pottyLeft(sor,oszlop),
-            height: _pottyMeret(),
-            width: _pottyMeret(),
+            height: _dotSize,
+            width: _dotSize,
             child:  Icon(Icons.fiber_manual_record,
-                size: _pottyMeret(), color: _milyenSzinuLegyek(sor, oszlop))));
+                size: _dotSize, color: _milyenSzinuLegyek(sor, oszlop))));
       }
     }
   }
