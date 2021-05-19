@@ -76,7 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
-            Expanded(child: _k1.getWidget(context)),
+            Expanded(child: _k1.getWidget(context)), //todo: itt csak egy kockat hivunk meg, ezert latszik csak egy. Kell egy kontener sok kockanak.
             Container(
               margin: const EdgeInsets.all(10.0),
               child: Row(
