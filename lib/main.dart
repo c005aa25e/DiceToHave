@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'cWurfel.dart';
+import 'Table.dart' as t;
 
 void main() {
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+  // This is the root of the application.
+  String _appName='Dice2Have';
+  Color _mainColor=Colors.yellow;
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Dobókocka',
+      title: this._appName,
       theme: ThemeData(
-        primarySwatch: Colors.yellow,
+        primarySwatch: this._mainColor,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'Dobókocka'),
+      home: MyHomePage(title: this._appName),
     );
   }
 }
@@ -35,12 +39,14 @@ class _MyHomePageState extends State<MyHomePage> {
     //legyartjuk a kockakat
     _k1 = Wurfel(lathatosag: false);
     _k2 = Wurfel(lathatosag: false);
+    _table = t.Table();
     //egy kocka modban indulunk
     _egykocka();
   }
 
   Wurfel _k1;
   Wurfel _k2;
+  t.Table _table;
 
   /*double _kockameret(double maxWidth, double maxHeight) {
     double m = maxWidth < maxHeight ? maxWidth : maxHeight;
@@ -76,7 +82,9 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
-            Expanded(child: _k1.getWidget(context)), //todo: itt csak egy kockat hivunk meg, ezert latszik csak egy. Kell egy kontener sok kockanak.
+            Expanded(
+                child: _table.getWidget(context,diceCount:8)
+            ),
             Container(
               margin: const EdgeInsets.all(10.0),
               child: Row(

@@ -194,7 +194,7 @@ class Wurfel {
   }
 
   ///Constructor for the class. If [lathatosag] is true, it is visible, otherwise not rendered.
-  Wurfel({bool lathatosag = false}) {
+  Wurfel({bool lathatosag = true}) {
     lathato = lathatosag;
 
   }
