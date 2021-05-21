@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'cWurfel.dart';
-import 'Table.dart' as t;
+import 'table.dart' as t;
 
 void main() {
   runApp(MyApp());
@@ -9,8 +8,8 @@ void main() {
 
 class MyApp extends StatelessWidget {
   // This is the root of the application.
-  String _appName='Dice2Have';
-  Color _mainColor=Colors.yellow;
+  final String _appName='Dice2Have';
+  final Color _mainColor=Colors.yellow;
 
   @override
   Widget build(BuildContext context) {
@@ -37,15 +36,13 @@ class _MyHomePageState extends State<MyHomePage> {
   _MyHomePageState() {
     //ez fut eloszor
     //legyartjuk a kockakat
-    _k1 = Wurfel(lathatosag: false);
-    _k2 = Wurfel(lathatosag: false);
-    _table = t.Table();
+    _table = t.Table(
+        count:1,
+        rotationEnabled: true);
     //egy kocka modban indulunk
     _egykocka();
   }
 
-  Wurfel _k1;
-  Wurfel _k2;
   t.Table _table;
 
   /*double _kockameret(double maxWidth, double maxHeight) {
@@ -55,16 +52,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }*/
   bool _rotationEnabled=true;
   void _egykocka() {
-    _k1.lathato = true;
-    _k2.lathato = false;
-    _k1.igazitas = MainAxisAlignment.center;
   }
 
   void _ketkocka() {
-    _k1.lathato = true;
-    _k2.lathato = true;
-    _k1.igazitas = MainAxisAlignment.end;
-    _k2.igazitas = MainAxisAlignment.start;
   }
 
   void _exitTapped(){
@@ -76,14 +66,14 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget
-            .title + ' ' + ((_k1.lathato) ? _k1.ertek : 0).toString()),
+            .title + '      < ' + _table.getSumOfValues().toString() + ' >'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
             Expanded(
-                child: _table.getWidget(context,diceCount:8)
+                child: _table.getWidget(context)
             ),
             Container(
               margin: const EdgeInsets.all(10.0),
@@ -93,31 +83,28 @@ class _MyHomePageState extends State<MyHomePage> {
                   FloatingActionButton(
                     onPressed: () {
                       setState(() {
-                        _k1.novel();
-                        _k2.novel();
+                        _table.count++;
                       });
                     },
-                    tooltip: 'Növel',
+                    tooltip: 'More',
                     child: Icon(Icons.add),
                   ),
                   FloatingActionButton(
                     onPressed: () {
                       setState(() {
-                        _k1.dobas();
-                        _k2.dobas();
+                        _table.doRoll();
                       });
                     },
-                    tooltip: 'Véletlen',
+                    tooltip: 'Roll',
                     child: Icon(Icons.fingerprint),
                   ),
                   FloatingActionButton(
                     onPressed: () {
                       setState(() {
-                        _k1.csokkent();
-                        _k2.csokkent();
+                        _table.count--;
                       });
                     },
-                    tooltip: 'Csökken',
+                    tooltip: 'Less',
                     child: Icon(Icons.remove),
                   ),
                 ],
@@ -139,9 +126,7 @@ class _MyHomePageState extends State<MyHomePage> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
           Text(
-            'Kockák száma: ' +
-                ((_k1.lathato ? 1 : 0) + (_k2.lathato ? 1 : 0))
-                    .toString(),
+            'Kockák száma: ' + _table.count.toString(),
           ),
           FloatingActionButton(
             onPressed: () {
@@ -172,8 +157,7 @@ class _MyHomePageState extends State<MyHomePage> {
         value: _rotationEnabled,
         onChanged: (bool value) {
           setState(() {
-            _rotationEnabled = value;
-            _k1.rotation=_rotationEnabled;
+            _table.rotationEnabled=value;
             Navigator.of(context).pop();
             SystemSound.play(SystemSoundType.click);
           });
