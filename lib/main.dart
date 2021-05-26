@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'cWurfel.dart';
+import 'table.dart' as t;
 
 void main() {
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+  // This is the root of the application.
+  final String _appName='Dice2Have';
+  final Color _mainColor=Colors.yellow;
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Dobókocka',
+      title: this._appName,
       theme: ThemeData(
-        primarySwatch: Colors.yellow,
+        primarySwatch: this._mainColor,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'Dobókocka'),
+      home: MyHomePage(title: this._appName),
     );
   }
 }
@@ -31,36 +34,23 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   _MyHomePageState() {
-    //ez fut eloszor
-    //legyartjuk a kockakat
-    _k1 = Wurfel(lathatosag: false);
-    _k2 = Wurfel(lathatosag: false);
-    //egy kocka modban indulunk
-    _egykocka();
+    //this runs first
+    //creating the table
+    _table = t.Table(
+        diceCount:1,
+        rotationEnabled: _rotationEnabled,
+        randomPosition: _randomPosition);
   }
 
-  Wurfel _k1;
-  Wurfel _k2;
+  ///Table, where the dice will be rendered
+  t.Table _table;
 
-  /*double _kockameret(double maxWidth, double maxHeight) {
-    double m = maxWidth < maxHeight ? maxWidth : maxHeight;
-    m = _k2.lathato ? m * 2 / 3 : m;
-    return m;
-  }*/
+  ///Enabling rotation of dice
   bool _rotationEnabled=true;
-  void _egykocka() {
-    _k1.lathato = true;
-    _k2.lathato = false;
-    _k1.igazitas = MainAxisAlignment.center;
-  }
 
-  void _ketkocka() {
-    _k1.lathato = true;
-    _k2.lathato = true;
-    _k1.igazitas = MainAxisAlignment.end;
-    _k2.igazitas = MainAxisAlignment.start;
-  }
-
+  ///Enabling random position for the dice. The dice will be smaller, and random position in the middle of their own box.
+  bool _randomPosition=false;
+  ///Closing the menu
   void _exitTapped(){
     SystemNavigator.pop();
   }
@@ -70,13 +60,15 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget
-            .title + ' ' + ((_k1.lathato) ? _k1.ertek : 0).toString()),
+            .title + '      < ' + _table.getSumOfValues().toString() + ' >'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
-            Expanded(child: _k1.getWidget(context)),
+            Expanded(
+                child: _table.getWidget(context)
+            ),
             Container(
               margin: const EdgeInsets.all(10.0),
               child: Row(
@@ -85,32 +77,36 @@ class _MyHomePageState extends State<MyHomePage> {
                   FloatingActionButton(
                     onPressed: () {
                       setState(() {
-                        _k1.novel();
-                        _k2.novel();
+                        _table.count++;
                       });
                     },
-                    tooltip: 'Növel',
+                    tooltip: 'More',
                     child: Icon(Icons.add),
                   ),
                   FloatingActionButton(
                     onPressed: () {
                       setState(() {
-                        _k1.dobas();
-                        _k2.dobas();
+                        _table.doRoll();
                       });
                     },
-                    tooltip: 'Véletlen',
+                    tooltip: 'Roll',
                     child: Icon(Icons.fingerprint),
                   ),
-                  FloatingActionButton(
-                    onPressed: () {
+                  InkWell(
+                    child: FloatingActionButton(
+                    tooltip: 'Less',
+                    child: Icon(Icons.remove),
+                      onPressed: () {
+                        setState(() {
+                          _table.count--;
+                        });
+                      },
+                    ),
+                    onLongPress: () { //todo: it definitely fails in virtual environment
                       setState(() {
-                        _k1.csokkent();
-                        _k2.csokkent();
+                        _table.count=1;
                       });
                     },
-                    tooltip: 'Csökken',
-                    child: Icon(Icons.remove),
                   ),
                 ],
               ),
@@ -123,7 +119,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
             children: <Widget>[
         AppBar(
-        title: Text('Beállítások'),
+        title: Text('Customize'),
       ),
       Container(
         margin: const EdgeInsets.all(10.0),
@@ -131,31 +127,7 @@ class _MyHomePageState extends State<MyHomePage> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
           Text(
-            'Kockák száma: ' +
-                ((_k1.lathato ? 1 : 0) + (_k2.lathato ? 1 : 0))
-                    .toString(),
-          ),
-          FloatingActionButton(
-            onPressed: () {
-              setState(() {
-                this._egykocka();
-                Navigator.of(context).pop();
-                SystemSound.play(SystemSoundType.click);
-              });
-            },
-            tooltip: 'Egykocka',
-            child: Icon(Icons.filter_1),
-          ),
-          FloatingActionButton(
-            onPressed: () {
-              setState(() {
-                this._ketkocka();
-                Navigator.of(context).pop();
-                SystemSound.play(SystemSoundType.click);
-              });
-            },
-            tooltip: 'Kétkocka',
-            child: Icon(Icons.filter_2),
+            'Count of dice: ' + _table.count.toString(),
           ),
         ],
       )),
@@ -164,8 +136,21 @@ class _MyHomePageState extends State<MyHomePage> {
         value: _rotationEnabled,
         onChanged: (bool value) {
           setState(() {
-            _rotationEnabled = value;
-            _k1.rotation=_rotationEnabled;
+            _rotationEnabled=value;
+            _table.rotationEnabled=_rotationEnabled;
+            Navigator.of(context).pop();
+            SystemSound.play(SystemSoundType.click);
+          });
+        },
+        secondary: const Icon(Icons.loop),
+      ),
+      SwitchListTile(
+        title: const Text('Random position'),
+        value: _randomPosition,
+        onChanged: (bool value) {
+          setState(() {
+            _randomPosition=value;
+            _table.randomPosition=_randomPosition;
             Navigator.of(context).pop();
             SystemSound.play(SystemSoundType.click);
           });
@@ -173,11 +158,22 @@ class _MyHomePageState extends State<MyHomePage> {
         secondary: const Icon(Icons.loop),
       ),
       ListTile(
+        leading: Icon(Icons.looks_one),
+        title: Text("One die only"),
+        dense:false,
+        onTap: (){
+          setState(() {
+            _table.count=1;
+            Navigator.of(context).pop();
+            SystemSound.play(SystemSoundType.click);
+          });
+        },
+      ),
+      ListTile(
         leading: Icon(Icons.exit_to_app),
         title: Text("Exit"),
         dense:false,
         onTap: _exitTapped,
-
       ),
       ],
     ),)
