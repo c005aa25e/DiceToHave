@@ -1,6 +1,6 @@
 import 'die.dart';
 
-/// Class representing a die rendered in its available space
+/// Class extending Die class with position information
 class PositionedWidget extends Die {
   double left;
   double top;

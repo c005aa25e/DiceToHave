@@ -34,29 +34,23 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   _MyHomePageState() {
-    //ez fut eloszor
-    //legyartjuk a kockakat
+    //this runs first
+    //creating the table
     _table = t.Table(
-        count:1,
-        rotationEnabled: true);
-    //egy kocka modban indulunk
-    _egykocka();
+        diceCount:1,
+        rotationEnabled: _rotationEnabled,
+        randomPosition: _randomPosition);
   }
 
+  ///Table, where the dice will be rendered
   t.Table _table;
 
-  /*double _kockameret(double maxWidth, double maxHeight) {
-    double m = maxWidth < maxHeight ? maxWidth : maxHeight;
-    m = _k2.lathato ? m * 2 / 3 : m;
-    return m;
-  }*/
+  ///Enabling rotation of dice
   bool _rotationEnabled=true;
-  void _egykocka() {
-  }
 
-  void _ketkocka() {
-  }
-
+  ///Enabling random position for the dice. The dice will be smaller, and random position in the middle of their own box.
+  bool _randomPosition=false;
+  ///Closing the menu
   void _exitTapped(){
     SystemNavigator.pop();
   }
@@ -98,14 +92,21 @@ class _MyHomePageState extends State<MyHomePage> {
                     tooltip: 'Roll',
                     child: Icon(Icons.fingerprint),
                   ),
-                  FloatingActionButton(
-                    onPressed: () {
-                      setState(() {
-                        _table.count--;
-                      });
-                    },
+                  InkWell(
+                    child: FloatingActionButton(
                     tooltip: 'Less',
                     child: Icon(Icons.remove),
+                      onPressed: () {
+                        setState(() {
+                          _table.count--;
+                        });
+                      },
+                    ),
+                    onLongPress: () { //todo: it definitely fails in virtual environment
+                      setState(() {
+                        _table.count=1;
+                      });
+                    },
                   ),
                 ],
               ),
@@ -118,7 +119,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
             children: <Widget>[
         AppBar(
-        title: Text('Beállítások'),
+        title: Text('Customize'),
       ),
       Container(
         margin: const EdgeInsets.all(10.0),
@@ -126,29 +127,7 @@ class _MyHomePageState extends State<MyHomePage> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
           Text(
-            'Kockák száma: ' + _table.count.toString(),
-          ),
-          FloatingActionButton(
-            onPressed: () {
-              setState(() {
-                this._egykocka();
-                Navigator.of(context).pop();
-                SystemSound.play(SystemSoundType.click);
-              });
-            },
-            tooltip: 'Egykocka',
-            child: Icon(Icons.filter_1),
-          ),
-          FloatingActionButton(
-            onPressed: () {
-              setState(() {
-                this._ketkocka();
-                Navigator.of(context).pop();
-                SystemSound.play(SystemSoundType.click);
-              });
-            },
-            tooltip: 'Kétkocka',
-            child: Icon(Icons.filter_2),
+            'Count of dice: ' + _table.count.toString(),
           ),
         ],
       )),
@@ -157,7 +136,21 @@ class _MyHomePageState extends State<MyHomePage> {
         value: _rotationEnabled,
         onChanged: (bool value) {
           setState(() {
-            _table.rotationEnabled=value;
+            _rotationEnabled=value;
+            _table.rotationEnabled=_rotationEnabled;
+            Navigator.of(context).pop();
+            SystemSound.play(SystemSoundType.click);
+          });
+        },
+        secondary: const Icon(Icons.loop),
+      ),
+      SwitchListTile(
+        title: const Text('Random position'),
+        value: _randomPosition,
+        onChanged: (bool value) {
+          setState(() {
+            _randomPosition=value;
+            _table.randomPosition=_randomPosition;
             Navigator.of(context).pop();
             SystemSound.play(SystemSoundType.click);
           });
@@ -165,11 +158,22 @@ class _MyHomePageState extends State<MyHomePage> {
         secondary: const Icon(Icons.loop),
       ),
       ListTile(
+        leading: Icon(Icons.looks_one),
+        title: Text("One die only"),
+        dense:false,
+        onTap: (){
+          setState(() {
+            _table.count=1;
+            Navigator.of(context).pop();
+            SystemSound.play(SystemSoundType.click);
+          });
+        },
+      ),
+      ListTile(
         leading: Icon(Icons.exit_to_app),
         title: Text("Exit"),
         dense:false,
         onTap: _exitTapped,
-
       ),
       ],
     ),)

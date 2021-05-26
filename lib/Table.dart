@@ -6,6 +6,7 @@ class Table {
   List<PositionedWidget> _dice=[];
   int _count;
   bool _rotationEnabled;
+  bool _randomPosition;
 
   List<Widget> _getPositionedWidgetList(BuildContext context,BoxConstraints constraints){
     List<Widget> retVal=[];
@@ -26,7 +27,6 @@ class Table {
     double availableWidth=constraints.maxWidth;
     int rowCount=1;
     int colCount=1;
-
 
     while (rowCount*colCount<_count) {
       if (availableHeight/rowCount>availableWidth/colCount){
@@ -67,52 +67,64 @@ class Table {
   }
 
   ///Populating the dice list with dice
-  void populateDiceList(){
+  void _populateDiceList(){
     _dice.clear();
     for (int i=0;i<_count;i++){
       _dice.add(PositionedWidget());
     }
+    _updateDiceAlignment();
   }
 
   int getSumOfValues(){
     int retVal=0;
     _dice.forEach((element) {
-      retVal+=element.ertek;
+      retVal+=element.value;
     });
     return retVal;
   }
-
 
   List<int> getValues(){
     final retVal=<int>[];
     retVal.clear();
     _dice.forEach((element) {
-      retVal.add(element.ertek);
+      retVal.add(element.value);
     });
     return retVal;
   }
   ///Constructor for the class. [diceCount] tells how many dices we want to render in the available space
-  Table({int count = 1, bool rotationEnabled=true}) {
-    this.count=count;
+  Table({int diceCount = 1, bool rotationEnabled=true, bool randomPosition=false}) {
+    this.count=diceCount;
     this.rotationEnabled=rotationEnabled;
-    populateDiceList();
+    this.rotationEnabled=randomPosition;
+    _populateDiceList();
+  }
+
+  void _updateDiceAlignment(){
+    _dice.forEach((element) {
+      element.rotation=_rotationEnabled;
+      element.randomPosition=_randomPosition;
+    });
+  }
+
+  bool get randomPosition => _randomPosition;
+
+  set randomPosition(bool value) {
+    _randomPosition = value;
+    _updateDiceAlignment();
   }
 
   bool get rotationEnabled => _rotationEnabled;
 
   set rotationEnabled(bool value) {
     _rotationEnabled = value;
-    _dice.forEach((element) {
-      element.rotation=_rotationEnabled;
-    });
+    _updateDiceAlignment();
   }
 
   int get count => _count;
 
   set count(int value) {
     _count = (value<1?1:value);
-    populateDiceList();
+    _populateDiceList();
   }
-
 
 }
